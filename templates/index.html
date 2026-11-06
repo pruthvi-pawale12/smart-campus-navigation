@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>AMGOI Smart Campus Navigation</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            background: #eef3f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 35px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px 5px;
+        }
+
+        .header h1 {
+            color: #075985;
+            font-size: 27px;
+        }
+
+        .header h2 {
+            color: #475569;
+            font-size: 18px;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .icon {
+            font-size: 48px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #e2e8f0;
+            margin: 20px 0;
+        }
+
+        .selection {
+            padding: 18px;
+            background: #eff6ff;
+            border-radius: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 12px;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        select {
+            border: 1px solid #94a3b8;
+            background: white;
+        }
+
+        button {
+            border: none;
+            background: #0878d1;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #075985;
+        }
+
+        .simulator {
+            margin-top: 25px;
+            padding: 18px;
+            border: 2px dashed #16a34a;
+            border-radius: 10px;
+            background: #f0fdf4;
+        }
+
+        .simulator h3 {
+            color: #15803d;
+        }
+
+        .simulator button {
+            background: #16a34a;
+            font-size: 13px;
+        }
+
+        .simulator button:hover {
+            background: #166534;
+        }
+
+        .rfid-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        @media(max-width: 480px) {
+
+            .container {
+                margin: 10px auto;
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .rfid-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="icon">🏫</div>
+
+        <h1>AMGOI Smart Campus Navigation</h1>
+
+        <h2>Ashokrao Mane Group of Institutions</h2>
+
+        <p>Welcome to Smart Campus Assistance System</p>
+
+        <p>Find your destination easily inside the campus.</p>
+
+    </div>
+
+    <hr>
+
+
+    <!-- DESTINATION SELECTION -->
+
+    <div class="selection">
+
+        <h3>📍 Find Your Destination</h3>
+
+        <form action="/map" method="GET">
+
+            <label for="location">
+                Select Department / Office / Laboratory
+            </label>
+
+            <select name="place" id="location" required>
+
+                <option value="">Select Your Destination</option>
+
+                {% for loc in locations %}
+
+                    <option value="{{ loc }}">
+                        {{ loc }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <button type="submit">
+                 <button type="button" onclick="findRoute()">
+    Find My Route
+</button>
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- RFID SIMULATOR -->
+
+    <div class="simulator">
+
+        <h3>⚡ Virtual Hardware Simulator</h3>
+
+        <p>
+            Demo mode: Test RFID card identification
+            without connecting physical hardware.
+        </p>
+
+        <div class="rfid-grid">
+
+            <button type="button"
+            onclick="simulateHardware('12345678')">
+                Main Gate RFID
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('LIBRARY01')">
+                Library RFID
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('CIVIL001')">
+                Civil Department
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('MECH0001')">
+                Mechanical Department
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('COMP0001')">
+                Computer Department
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('ENTC0001')">
+                E&TC Department
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('CIVLAB01')">
+                Civil Lab
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('COMPLAB01')">
+                Computer Lab
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('MECHLAB01')">
+                Mechanical Lab
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('APPLLAB01')">
+                Applied Science Lab
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('ELECLAB01')">
+                Electrical Lab
+            </button>
+
+            <button type="button"
+            onclick="simulateHardware('ENTCLAB01')">
+                E&TC Lab
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROJECT INFORMATION -->
+
+    <div class="info">
+
+        <h3>ℹ️ How to Use</h3>
+
+        <p>1. Select your required destination.</p>
+
+        <p>2. Click on Find My Route.</p>
+
+        <p>3. View the campus floor layout.</p>
+
+        <p>4. Follow the displayed directions.</p>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        <p>AMGOI Smart Campus Navigation System</p>
+
+        <p>Engineering Mega Project - 2026</p>
+
+        <p>Software Demonstration Version</p>
+
+    </div>
+
+</div>
+
+
+<!-- RFID JAVASCRIPT -->
+
+<script>
+
+    function simulateHardware(rfidTag) {
+
+        fetch('/api/hardware_trigger', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+                rfid_id: rfidTag
+            })
+
+        })
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if (data.status === 'success') {
+
+                alert(
+                    "Hardware Signal Received!\n" +
+                    "Destination: " + data.destination +
+                    "\nFloor: " + data.floor +
+                    "\nBuzzer: " + data.buzzer
+                );
+
+                window.location.href =
+                    "/map?place=" +
+                    encodeURIComponent(data.destination);
+
+            } else {
+
+                alert("Error: " + data.message);
+
+            }
+
+        })
+
+        .catch(error => {
+
+            alert("Unable to connect to Flask Server.");
+
+            console.error(error);
+
+        });
+
+    }
+
+</script>
+
+</body>
+</html>

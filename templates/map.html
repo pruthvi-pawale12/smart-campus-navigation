@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>AMGOI Smart Campus Navigation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        h2, h3 {
+            color: #075985;
+        }
+
+        .header {
+            text-align: center;
+            padding: 10px;
+        }
+
+        form {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 7px;
+            border: 1px solid #94a3b8;
+            font-size: 16px;
+        }
+
+        button {
+            background: #0878d1;
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .route {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .visual-route {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eff6ff;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .route-node {
+            background: white;
+            border: 2px solid #0878d1;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px auto;
+            max-width: 300px;
+            font-weight: bold;
+        }
+
+        .route-active {
+            background: #22c55e;
+            color: white;
+            border-color: #166534;
+        }
+
+        .route-arrow {
+            color: #0878d1;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .floor {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .staircases {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .stair {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 10px;
+            border-radius: 7px;
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .zone {
+            background: white;
+            border: 2px solid #94a3b8;
+            padding: 15px 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: #22c55e;
+            color: white;
+            border-color: #166534;
+        }
+
+        .corridor {
+            margin: 12px 0;
+            padding: 12px;
+            text-align: center;
+            background: #fef3c7;
+            border: 2px dashed #d97706;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .office {
+            margin-top: 15px;
+            padding: 15px;
+            background: #dbeafe;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .warning {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            font-size: 13px;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #0878d1;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media(max-width: 500px) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 7px;
+            }
+
+            .zone {
+                font-size: 13px;
+                padding: 10px 4px;
+            }
+
+            .stair {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>AMGOI Smart Campus Navigation</h2>
+        <p>Find your Department, Office, Library or Laboratory</p>
+    </div>
+
+    <!-- Destination Selection -->
+
+    <form action="/map" method="GET">
+
+        <label><b>Select Your Destination</b></label>
+
+        <select name="place" required>
+
+            {% for loc in locations %}
+                <option value="{{ loc }}"
+                {% if place == loc %}selected{% endif %}>
+                    {{ loc }}
+                </option>
+            {% endfor %}
+
+        </select>
+
+        <button type="submit">Find My Route</button>
+
+    </form>
+
+
+    <!-- Destination Information -->
+
+    <div class="route">
+
+        <h3>Destination Information</h3>
+
+        <p><b>Destination:</b> {{ place }}</p>
+        <p><b>Floor:</b> {{ details.floor }}</p>
+        <p><b>Location:</b> {{ details.side }}</p>
+        <p><b>Starting Point:</b> Main Entrance</p>
+
+        <h3>Step-by-Step Directions</h3>
+
+        {% if route.available %}
+
+            <ol>
+                {% for step in route.steps %}
+                    <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+
+        {% else %}
+
+            {% for step in route.steps %}
+                <p>{{ step }}</p>
+            {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Visual Route -->
+
+    <div class="visual-route">
+
+        <h3>Visual Route Navigation</h3>
+
+        <p>Starting Point</p>
+
+        <div class="route-node">
+            Main Entrance
+        </div>
+
+        <div class="route-arrow">↓</div>
+
+        <div class="route-node">
+            Central Corridor
+        </div>
+
+        {% if route.available %}
+
+            {% if route.staircase == "Left or Right Staircase" %}
+
+                <div class="route-arrow">↓</div>
+                <div class="route-node route-active">
+                    Left or Right Staircase
+                </div>
+
+            {% elif route.staircase == "Left Staircase" %}
+
+                <div class="route-arrow">↓</div>
+                <div class="route-node route-active">
+                    Left Staircase
+                </div>
+
+            {% elif route.staircase == "Right Staircase" %}
+
+                <div class="route-arrow">↓</div>
+                <div class="route-node route-active">
+                    Right Staircase
+                </div>
+
+            {% endif %}
+
+            <div class="route-arrow">↓</div>
+
+            <div class="route-node">
+                {{ details.floor }}
+            </div>
+
+            <div class="route-arrow">↓</div>
+
+            <div class="route-node route-active">
+                {{ place }}
+            </div>
+
+            <p><b>Destination Reached!</b></p>
+
+        {% else %}
+
+            <p>Route is not available yet.</p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- SECOND FLOOR -->
+
+    <div class="floor">
+
+        <h3>Second Floor</h3>
+
+        <div class="staircases">
+            <div class="stair">Left Staircase</div>
+            <div class="stair">Right Staircase</div>
+        </div>
+
+        <div class="corridor
+        {% if place == 'Library' %}highlight{% endif %}">
+            Central Corridor
+            {% if place == 'Library' %}
+                - LIBRARY SELECTED
+            {% endif %}
+        </div>
+
+        <div class="grid">
+
+            <div class="zone
+            {% if place == 'Electrical Department' or place == 'Electrical Lab' %}
+                highlight
+            {% endif %}">
+                Electrical Department<br>
+                Electrical Lab<br>
+                Left Side
+            </div>
+
+            <div class="zone
+            {% if place == 'E&TC Department' or place == 'E&TC Lab' %}
+                highlight
+            {% endif %}">
+                E&TC Department<br>
+                E&TC Lab<br>
+                Right Side
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FIRST FLOOR -->
+
+    <div class="floor">
+
+        <h3>First Floor</h3>
+
+        <div class="staircases">
+            <div class="stair">Left Staircase</div>
+            <div class="stair">Right Staircase</div>
+        </div>
+
+        <div class="grid">
+
+            <div class="zone
+            {% if place == 'Applied Science Department' or place == 'Applied Science Lab' %}
+                highlight
+            {% endif %}">
+                Applied Science Department<br>
+                Applied Science Lab<br>
+                Left Side
+            </div>
+
+            <div class="zone
+            {% if place == 'Computer Department' or place == 'Computer Lab' %}
+                highlight
+            {% endif %}">
+                Computer Department<br>
+                Computer Lab<br>
+                Right Side
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- GROUND FLOOR -->
+
+    <div class="floor">
+
+        <h3>Ground Floor</h3>
+
+        <div class="staircases">
+            <div class="stair">Left Staircase</div>
+            <div class="stair">Right Staircase</div>
+        </div>
+
+        <div class="grid">
+
+            <div class="zone
+            {% if place == 'Civil Department' or place == 'Civil Lab' %}
+                highlight
+            {% endif %}">
+                Civil Department<br>
+                Civil Lab<br>
+                Left Side
+            </div>
+
+            <div class="zone
+            {% if place == 'Mechanical Department' or place == 'Mechanical Lab' %}
+                highlight
+            {% endif %}">
+                Mechanical Department<br>
+                Mechanical Lab<br>
+                Right Side
+            </div>
+
+        </div>
+
+        <div class="office
+        {% if place == 'Main Office' or place == 'Main Gate' %}
+            highlight
+        {% endif %}">
+
+            Main Entrance / Main Office
+
+        </div>
+
+    </div>
+
+
+    <!-- CANTEEN STATUS -->
+
+    {% if place == 'Canteen' %}
+
+        <div class="warning">
+            Canteen location is not confirmed yet.
+        </div>
+
+    {% endif %}
+
+
+    <!-- NOTE -->
+
+    <div class="warning">
+
+        <b>Project Note:</b>
+
+        This is a prototype campus layout based on the
+        provided building information. Actual walking
+        paths and exact room positions must be verified
+        before real visitor use.
+
+    </div>
+
+
+    <a href="/" class="back">
+        ← Back to Home
+    </a>
+
+</div>
+
+</body>
+</html>
